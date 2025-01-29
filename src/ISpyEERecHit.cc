@@ -96,15 +96,11 @@ ISpyEERecHit::analyze( const edm::Event& event, const edm::EventSetup& eventSetu
       float time = (*it).time ();
       float eta = pos.eta ();
       float phi = pos.phi ();
-
-
+      
       const CaloSubdetectorGeometry* caloSubdetectorGeometry = caloGeometry_->getSubdetectorGeometry((*it).detid ());
-
-
-
       float deltaEta = caloSubdetectorGeometry->deltaEta((*it).detid());
       float deltaPhi = caloSubdetectorGeometry->deltaPhi((*it).detid());
-
+      
       IgCollectionItem irechit = recHits.create();
       irechit[E] = static_cast<double>(energy);
       irechit[ETA] = static_cast<double>(eta);
