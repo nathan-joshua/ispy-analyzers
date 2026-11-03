@@ -1,11 +1,15 @@
 #ifndef ANALYZER_ISPY_GEMRECHIT_H
 #define ANALYZER_ISPY_GEMRECHIT_H
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/GEMRecHit/interface/GEMRecHitCollection.h"
 
-class ISpyGEMRecHit : public edm::EDAnalyzer
+#include "Geometry/Records/interface/MuonGeometryRecord.h"
+
+class GEMGeometry;
+
+class ISpyGEMRecHit : public edm::one::EDAnalyzer<>
 {
 public:
   explicit ISpyGEMRecHit(const edm::ParameterSet&);
@@ -15,6 +19,10 @@ public:
 private:
   edm::InputTag inputTag_;
   edm::EDGetTokenT<GEMRecHitCollection> rechitToken_;
+  
+  edm::ESGetToken<GEMGeometry, MuonGeometryRecord> gemGeometryToken_;
+  const GEMGeometry* gemGeometry_;
+  
 };
 
 #endif // ANALYZER_ISPY_GEMRECHIT_H

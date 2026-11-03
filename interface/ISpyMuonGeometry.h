@@ -1,7 +1,7 @@
 #ifndef ANALYZER_ISPY_MUON_GEOMETRY_H
 #define ANALYZER_ISPY_MUON_GEOMETRY_H
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/ESWatcher.h"
 #include "DataFormats/DetId/interface/DetId.h"
@@ -14,11 +14,12 @@ class CSCGeometry;
 class DTGeometry;
 class RPCGeometry;
 class GEMGeometry;
+
 class IgDataStorage;
 class IgCollectionItem;
 class MuonGeometryRecord;
 
-class ISpyMuonGeometry : public edm::EDAnalyzer
+class ISpyMuonGeometry : public edm::one::EDAnalyzer<>
 {
 public:
   explicit ISpyMuonGeometry(const edm::ParameterSet&);
@@ -46,11 +47,17 @@ private:
   void	addCorners(IgCollectionItem&, const GeomDet *);
 
   bool muonGeomChanged_;
+  
+  edm::ESGetToken<CSCGeometry, MuonGeometryRecord> cscGeometryToken_;
+  edm::ESGetToken<DTGeometry, MuonGeometryRecord>  dtGeometryToken_;
+  edm::ESGetToken<GEMGeometry, MuonGeometryRecord> gemGeometryToken_;
+  edm::ESGetToken<RPCGeometry, MuonGeometryRecord> rpcGeometryToken_;
 
-  edm::ESHandle<CSCGeometry> cscGeom_;
-  edm::ESHandle<DTGeometry> dtGeom_;
-  edm::ESHandle<RPCGeometry> rpcGeom_;
-  edm::ESHandle<GEMGeometry> gemGeom_;
+  const CSCGeometry* cscGeom_;
+  const DTGeometry*  dtGeom_;
+  const RPCGeometry* rpcGeom_;
+  const GEMGeometry* gemGeom_;
+  
   edm::ESWatcher<MuonGeometryRecord> watch_muonGeom_;
 
 };

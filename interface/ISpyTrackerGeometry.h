@@ -1,7 +1,7 @@
 #ifndef ANALYZER_ISPY_TRACKER_GEOMETRY_H
 #define ANALYZER_ISPY_TRACKER_GEOMETRY_H
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/ESWatcher.h"
 #include "DataFormats/DetId/interface/DetId.h"
@@ -17,8 +17,9 @@ class IgCollectionItem;
 class GlobalTrackingGeometryRecord;
 class TrackerDigiGeometryRecord;
 class TrackerTopology;
+class TrackerTopologyRcd;
 
-class ISpyTrackerGeometry : public edm::EDAnalyzer
+class ISpyTrackerGeometry : public edm::one::EDAnalyzer<>
 {
 public:
   explicit ISpyTrackerGeometry(const edm::ParameterSet&);
@@ -50,9 +51,13 @@ private:
   bool globalTrackingGeomChanged_;
   bool trackerGeomChanged_;
 
-  edm::ESHandle<GlobalTrackingGeometry> globalTrackingGeom_;
-  edm::ESHandle<TrackerGeometry>      	trackerGeom_;
-  edm::ESHandle<TrackerTopology>        trackerTopology_;
+  edm::ESGetToken<GlobalTrackingGeometry, GlobalTrackingGeometryRecord> globalTrackingGeometryToken_;
+  edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> trackerGeometryToken_;
+  edm::ESGetToken<TrackerTopology, TrackerTopologyRcd> trackerTopologyToken_;
+
+  const GlobalTrackingGeometry* globalTrackingGeom_;
+  const TrackerGeometry*      	trackerGeom_;
+  const TrackerTopology*        trackerTopology_;
 
   edm::ESWatcher<GlobalTrackingGeometryRecord>  watch_globalTrackingGeom_;
   edm::ESWatcher<TrackerDigiGeometryRecord>	watch_trackerGeom_;

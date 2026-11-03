@@ -1,12 +1,14 @@
 #ifndef ANALYZER_ISPY_PFHCALRECHIT_H
 #define ANALYZER_ISPY_PFHCALRECHIT_H
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 
 #include "DataFormats/ParticleFlowReco/interface/PFRecHitFwd.h"
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
 
-class ISpyPFHcalRecHit : public edm::EDAnalyzer
+class ISpyPFHcalRecHit : public edm::one::EDAnalyzer<>
 {
 public:
   explicit ISpyPFHcalRecHit(const edm::ParameterSet&);
@@ -23,6 +25,8 @@ private:
   edm::EDGetTokenT<reco::PFRecHitCollection> hfToken_;
   edm::EDGetTokenT<reco::PFRecHitCollection> hoToken_;
 
+  edm::ESGetToken<CaloGeometry, CaloGeometryRecord> caloGeometryToken_;
+  const CaloGeometry* caloGeometry_;
 };
 
 #endif // ANALYZER_ISPY_PFHCALRECHIT_H

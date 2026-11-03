@@ -1,13 +1,17 @@
 #ifndef ANALYZER_ISPY_EEDIGI_H
 #define ANALYZER_ISPY_EEDIGI_H
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 
 #include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
 
-class ISpyEEDigi : public edm::EDAnalyzer
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+
+class CaloGeometry;
+
+class ISpyEEDigi : public edm::one::EDAnalyzer<>
 {
 public:
     explicit ISpyEEDigi(const edm::ParameterSet&);
@@ -19,5 +23,9 @@ private:
 
   edm::EDGetTokenT<EEDigiCollection> digiToken_;
   edm::EDGetTokenT<EcalRecHitCollection> rechitToken_;
+
+  edm::ESGetToken<CaloGeometry, CaloGeometryRecord> caloGeometryToken_;
+  const CaloGeometry* caloGeometry_;
+
 };
 #endif // ANALYZER_ISPY_EEDIGI_H

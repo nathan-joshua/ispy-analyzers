@@ -21,15 +21,12 @@
 #include "FWCore/Utilities/interface/Exception.h"
 
 #include "Geometry/CommonDetUnit/interface/GeomDet.h"
-#include "Geometry/CommonDetUnit/interface/GlobalTrackingGeometry.h"
 #include "Geometry/CommonTopologies/interface/StripTopology.h"
-#include "Geometry/Records/interface/GlobalTrackingGeometryRecord.h"
-
-#include "MagneticField/Engine/interface/MagneticField.h"
-#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 
 #include "TrackPropagation/SteppingHelixPropagator/interface/SteppingHelixPropagator.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
+
+#include "MagneticField/Engine/interface/MagneticField.h"
 
 using namespace edm::service;
 
@@ -38,6 +35,8 @@ ISpyTrack::ISpyTrack( const edm::ParameterSet& iConfig )
     ptMin_(iConfig.getParameter<double>("ptMin"))
 {
   trackToken_ = consumes<reco::TrackCollection>(inputTag_);
+  trackingGeometryToken_ = esConsumes<GlobalTrackingGeometry, GlobalTrackingGeometryRecord>();
+  magneticFieldToken_ = esConsumes<MagneticField, IdealMagneticFieldRecord>();
 }
 
 void 
@@ -55,11 +54,10 @@ ISpyTrack::analyze( const edm::Event& event, const edm::EventSetup& eventSetup)
   }
 
   IgDataStorage *storage = config->storage();
+  
+  trackingGeometry_ = &eventSetup.getData(trackingGeometryToken_);
 
-  edm::ESHandle<GlobalTrackingGeometry> geometry;
-  eventSetup.get<GlobalTrackingGeometryRecord> ().get (geometry);
-
-  if ( ! geometry.isValid() )
+  if ( ! trackingGeometry_ )
   {
     std::string error = 
       "### Error: ISpyTrack::analyze: Invalid GlobalTrackingGeometryRecord ";
@@ -67,10 +65,9 @@ ISpyTrack::analyze( const edm::Event& event, const edm::EventSetup& eventSetup)
     return;
   }
 
-  edm::ESHandle<MagneticField> field;    
-  eventSetup.get<IdealMagneticFieldRecord> ().get (field);
+  magneticField_ = &eventSetup.getData(magneticFieldToken_);
 
-  if ( ! field.isValid() )
+  if ( ! magneticField_ )
   {
     std::string error = 
       "### Error: ISpyTrack::analyze: Invalid Magnetic field ";
@@ -81,7 +78,7 @@ ISpyTrack::analyze( const edm::Event& event, const edm::EventSetup& eventSetup)
   edm::Handle<reco::TrackCollection> collection;
   event.getByToken (trackToken_, collection);
 
-  if (collection.isValid ())
+  if ( collection.isValid())
   {	    	
     std::string product = "Tracks "
                           + edm::TypeID (typeid (reco::TrackCollection)).friendlyClassName() + ":" 
@@ -183,11 +180,11 @@ ISpyTrack::analyze( const edm::Event& event, const edm::EventSetup& eventSetup)
           if ((*it)->isValid () && !(*it)->geographicalId ().null ())
           {
             IgCollectionItem hit = hits.create ();
-            LocalPoint point = ISpyLocalPosition::localPosition(&(**it), geometry.product());
+            LocalPoint point = ISpyLocalPosition::localPosition(&(**it), trackingGeometry_);
 
-            hit[HIT_POS] = IgV3d(geometry->idToDet((*it)->geographicalId())->surface().toGlobal(point).x()/100.0,
-                                 geometry->idToDet((*it)->geographicalId())->surface().toGlobal(point).y()/100.0,
-                                 geometry->idToDet((*it)->geographicalId())->surface().toGlobal(point).z()/100.0);
+            hit[HIT_POS] = IgV3d(trackingGeometry_->idToDet((*it)->geographicalId())->surface().toGlobal(point).x()/100.0,
+                                 trackingGeometry_->idToDet((*it)->geographicalId())->surface().toGlobal(point).y()/100.0,
+                                 trackingGeometry_->idToDet((*it)->geographicalId())->surface().toGlobal(point).z()/100.0);
 
             trackHits.associate (item, hit);
               
@@ -196,7 +193,7 @@ ISpyTrack::analyze( const edm::Event& event, const edm::EventSetup& eventSetup)
 
             GlobalPoint p[8];
 
-            const GeomDet* detUnit = geometry->idToDet((*it)->geographicalId());
+            const GeomDet* detUnit = trackingGeometry_->idToDet((*it)->geographicalId());
             const Bounds* b = &((detUnit->surface()).bounds());
  
             if(  const TrapezoidalPlaneBounds *b2 = dynamic_cast<const TrapezoidalPlaneBounds *>(b) )

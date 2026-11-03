@@ -1,11 +1,14 @@
 #ifndef ANALYZER_ISPY_CALO_TOWER_H
 #define ANALYZER_ISPY_CALO_TOWER_H
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
 
-class ISpyCaloTower : public edm::EDAnalyzer
+class CaloGeometry;
+class CaloGeometryRecord;
+
+class ISpyCaloTower : public edm::one::EDAnalyzer<>
 {
 
 public:
@@ -18,6 +21,8 @@ private:
   edm::InputTag	inputTag_;
   edm::EDGetTokenT<CaloTowerCollection> caloTowerToken_;
 
+  edm::ESGetToken<CaloGeometry, CaloGeometryRecord> caloGeometryToken_;
+  const CaloGeometry* caloGeometry_;
 };
 
 #endif // ANALYZER_ISPY_CALO_TOWER_H

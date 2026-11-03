@@ -1,15 +1,18 @@
-
 #ifndef ANALYZER_ISPY_TRACK_H
 #define ANALYZER_ISPY_TRACK_H
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
-#include <vector>
 
-//typedef std::vector<edm::InputTag> VInputTag;
+#include "Geometry/CommonDetUnit/interface/GlobalTrackingGeometry.h"
+#include "Geometry/Records/interface/GlobalTrackingGeometryRecord.h"
 
-class ISpyTrack : public edm::EDAnalyzer
+#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
+
+class MagneticField;
+
+class ISpyTrack : public edm::one::EDAnalyzer<>
 {
 public:
   explicit ISpyTrack(const edm::ParameterSet&);
@@ -19,6 +22,12 @@ public:
 private:
   edm::InputTag	inputTag_;
   edm::EDGetTokenT<reco::TrackCollection> trackToken_;
+
+  edm::ESGetToken<GlobalTrackingGeometry, GlobalTrackingGeometryRecord> trackingGeometryToken_;
+  const GlobalTrackingGeometry* trackingGeometry_;
+  
+  edm::ESGetToken<MagneticField, IdealMagneticFieldRecord> magneticFieldToken_;    
+  const MagneticField* magneticField_;
 
   double ptMin_;
 };
